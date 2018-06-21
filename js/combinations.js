@@ -11,51 +11,50 @@
  * @returns {number[][]} 組合せ nCk 
  */
 const combinations = (() => {
-    /**
-     * @param {number} a
-     * @param {number} b
-     * @return {number[]}
-     */
+    const cons = (head, tail) => ({ head, tail });
+    const list = (items) => {
+        let l = null;
+        for (let i = items.length - 1; i >= 0; i--) {
+            l = cons(items[i], l);
+        }
+        return l;
+    };
+    const array = (items) => {
+        const a = [];
+        while (items !== null) {
+            a.push(items.head);
+            items = items.tail;
+        }
+        return a;
+    };
+
+    const matchList = (items, cases) =>
+        (items === null) ? cases.nil() : cases.cons(items.head, items.tail);
+
     const range = (a, b) => {
         const nums = [];
         for (let i = a; i <= b; i++)
             nums.push(i);
-        return nums;
+        return list(nums);
     };
 
     return (n, k) => {
-        /**
-         * 
-         * @param {number} i 
-         * @param {number[]} nums 
-         * @return {number[]}
-         */
-        const f = (i, nums) => {
-            if (nums.length === 0) {
-                return [];
-            } else {
-                const x = nums[0];
-                const xs = nums.slice(1);
-                const ys = f(i + 1, xs);
-                if (ys.length === 0)
-                    return (x + k - i > n) ? [] : range(x + 1, x + k - i);
-                else
-                    return [x].concat(ys);
+        const f = (i, nums) => matchList(nums, {
+            nil: () => null,
+            cons: (x, xs) => matchList(f(i + 1, xs), {
+                nil: () => (x + k - i) > n ? null : range(x + 1, x + k - i),
+                cons: (y, ys) => cons(x, cons(y, ys))
+            })
+        });
+
+        const g = (nums) => matchList(nums, {
+            nil: () => null,
+            cons: (x, xs) => {
+                const X = cons(x, xs);
+                return cons(X, g(f(0, X)));
             }
-        };
-
-        /**
-         * @param {number[]} nums 
-         * @returns {number[][]}
-         */
-        const g = (nums) => {
-            if (nums.length === 0)
-                return [];
-            else
-                return [nums].concat(g(f(0, nums)));
-        };
-
-        return g(range(1, k));
+        });
+        return array(g(range(1, k))).map(array);
     };
 })();
 
