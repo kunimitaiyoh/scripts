@@ -47,14 +47,16 @@ const combinations = (() => {
             })
         });
 
-        const g = (nums) => matchList(nums, {
-            nil: () => null,
-            cons: (x, xs) => {
-                const X = cons(x, xs);
-                return cons(X, g(f(0, X)));
+        const items = [range(0, k - 1)];
+        while (true) {
+            const next = f(0, items[items.length - 1]);
+            
+            if (next !== null) {
+                items.push(next);
+            } else {
+                return items.map(array);
             }
-        });
-        return array(g(range(0, k - 1))).map(array);
+        };
     };
 })();
 
