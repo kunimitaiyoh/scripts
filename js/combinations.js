@@ -54,7 +54,7 @@ const combinations = (() => {
                 return cons(X, g(f(0, X)));
             }
         });
-        return array(g(range(1, k))).map(array);
+        return array(g(range(0, k - 1))).map(array);
     };
 })();
 
